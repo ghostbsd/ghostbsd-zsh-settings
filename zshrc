@@ -82,10 +82,13 @@ function git_info() {
     return 1  # Return 1 if not inside a Git repository
   fi
 
-  # Get the current Git branch
+  # Get the current Git branch or fallback to describe if in detached HEAD
   local branch=$(git symbolic-ref --short HEAD 2>/dev/null)
+  if [[ -z "$branch" ]]; then
+    branch=$(git describe --tags --always 2>/dev/null)
+  fi
 
-  # Return the Git info with the branch name
+  # Return the Git info with the branch or fallback name
   echo "%F{$host_color}($branch)%f"
 }
 
