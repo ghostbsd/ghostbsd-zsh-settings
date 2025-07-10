@@ -5,7 +5,7 @@ autoload -Uz compinit && compinit
 
 ZSH_AUTOSUGGEST_STRATEGY=(match_prev_cmd history completion)
 
-source /usr/local/share/zsh-autosuggestions/zsh-autosuggestions.zsh 
+source /usr/local/share/zsh-autosuggestions/zsh-autosuggestions.zsh
 
 # Use fish-style command history
 HISTFILE=~/.zsh_history      # Location of history file
@@ -70,11 +70,33 @@ local user_color='2'      # ANSI 2 (Terminator's 3rd color, green)
 local host_color='fg'     # Terminal's default foreground
 local path_color='2'      # ANSI 2 (Terminator's 3rd color, green)
 
+# Git info function to show branch info in prompt, with fallback if Git is not installed
+function git_info() {
+  # Check if Git is installed
+  if ! command -v git &>/dev/null; then
+    return 1  # Return 1 if Git is not installed
+  fi
+
+  # Check if inside a Git repository
+  if ! git rev-parse --is-inside-work-tree &>/dev/null; then
+    return 1  # Return 1 if not inside a Git repository
+  fi
+
+  # Get the current Git branch or fallback to describe if in detached HEAD
+  local branch=$(git symbolic-ref --short HEAD 2>/dev/null)
+  if [[ -z "$branch" ]]; then
+    branch=$(git describe --tags --always 2>/dev/null)
+  fi
+
+  # Return the Git info with the branch or fallback name
+  echo "%F{$host_color}($branch)%f"
+}
+
 # Check for 256-color support
 if [[ "$TERM" == *256color* ]]; then
   # Use ANSI 2 and terminal foreground with Fish-like path
-  PROMPT="%F{$user_color}%n%f@%F{$host_color}%m%f %F{$path_color}\$(fish_like_path)%f %# "
+  PROMPT="%F{$user_color}%n%f@%F{$host_color}%m%f %F{$path_color}\$(fish_like_path)\$(git_info)%f %# "
 else
   # Fallback to ANSI 2 and terminal foreground with Fish-like path
-  PROMPT="%F{$user_color}%n%f@%F{$host_color}%m%f %F{$path_color}\$(fish_like_path)%f %# "
+  PROMPT="%F{$user_color}%n%f@%F{$host_color}%m%f %F{$path_color}\$(fish_like_path)\$(git_info)%f %# "
 fi
