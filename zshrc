@@ -1,4 +1,4 @@
-fpath=(path/to/zsh-completions/src $fpath)
+fpath=(/usr/local/share/zsh-completions $fpath)
 
 # Initialize completion system
 autoload -Uz compinit && compinit
@@ -6,6 +6,11 @@ autoload -Uz compinit && compinit
 ZSH_AUTOSUGGEST_STRATEGY=(match_prev_cmd history completion)
 
 source /usr/local/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+source /usr/local/share/zsh-fast-syntax-highlighting/fast-syntax-highlighting.plugin.zsh
+
+# Color ls output
+export CLICOLOR=1
+alias ls='ls --color=auto'
 
 # Use fish-style command history
 HISTFILE=~/.zsh_history      # Location of history file
